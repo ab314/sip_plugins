@@ -53,6 +53,12 @@ $var page: plugins
                 </td>
             </tr>
             <tr>
+                <td style='text-transform: none;'>$_('Min percentage as floor'):</td>
+                <td>
+                    <input name='wl_min_floor' type='checkbox'${" checked" if m_vals['wl_min_floor'] == "on" else ""}>
+                </td>
+            </tr>
+            <tr>
                 <td style='text-transform: none;'>$_('Max percentage'):</td>
                 <td>
                     <input name='wl_max' type='number' min="100" max="1000" value=$m_vals["wl_max"]>
@@ -91,7 +97,7 @@ $var page: plugins
             <tr>
                 <td style='text-transform: none;'>$_('Status'):</td>
                 <td>
-                    <textarea style="font-family: monospace;" rows="7" cols="35" readonly>$m_vals['status']</textarea>
+                    <textarea style="font-family: monospace;" rows="20" cols="50" readonly>$m_vals['status']</textarea>
                 </td>
             </tr>
         </table>
