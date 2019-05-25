@@ -122,16 +122,16 @@ class WeatherLevelChecker(Thread):
 
                     water_adjustment = round((water_left / ini_water_needed)*100, 1)
 
-                    if (water_adjustment < safe_float(options['wl_min']))
+                    if water_adjustment < safe_float(options['wl_min']):
                         if(options['wl_min_floor'] == "on")
                           #If floor option is set (default) run no less than the provided minimum
                           self.add_status('Calculated water level of %f limited to minimum of %f' % (water_adjustment, safe_float(options['wl_min'])))
                           water_adjustment = safe_float(options['wl_min'])
-                        else
+                        else:
                           #If floor option is not set, set water adjustment level to 0% if less than the min level
                           self.add_status('Calculated water level of %f set to 0%% due to less than minimum level' % water_adjustment)
                           water_adjustment = 0
-                    if (water_adjustment > safe_float(options['wl_max']))
+                    if water_adjustment > safe_float(options['wl_max']):
                         #Limit water adjustment to the max level
                         self.add_status('Calculated water level of %f limited to maximum of %f' % (water_adjustment, safe_float(options['wl_max'])))
                         water_adjustment = safe_float(options['wl_max'])
