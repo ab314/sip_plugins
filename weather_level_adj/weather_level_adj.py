@@ -1,5 +1,5 @@
 '''
-Created on Mar 24, 2019
+Created on Mar 25, 2019
 
 @author: wenyu
 '''
@@ -98,6 +98,7 @@ class WeatherLevelChecker(Thread):
                     forecast = forecast_info(self, options, today)
                     history = history_info(self, today, options)
 
+                    self.add_status('Updated at %s for location %f,%f' % (datetime.datetime.now(), today['lat'], today['lon']))
                     self.add_status('Using %d historical days, %d forecast days and today in calculations.' % (int(options['days_history']), int(options['days_history'])))
 
                     total_info = {
@@ -121,8 +122,20 @@ class WeatherLevelChecker(Thread):
 
                     water_adjustment = round((water_left / ini_water_needed)*100, 1)
 
-                    water_adjustment = max(safe_float(options['wl_min']), min(safe_float(options['wl_max']), water_adjustment))
-
+                    if (water_adjustment < safe_float(options['wl_min']))
+                        if(options['wl_min_floor'] == "on")
+                          #If floor option is set (default) run no less than the provided minimum
+                          self.add_status('Calculated water level of %f limited to minimum of %f' % (water_adjustment, safe_float(options['wl_min'])))
+                          water_adjustment = safe_float(options['wl_min'])
+                        else
+                          #If floor option is not set, set water adjustment level to 0% if less than the min level
+                          self.add_status('Calculated water level of %f set to 0%% due to less than minimum level' % water_adjustment)
+                          water_adjustment = 0
+                    if (water_adjustment > safe_float(options['wl_max']))
+                        #Limit water adjustment to the max level
+                        self.add_status('Calculated water level of %f limited to maximum of %f' % (water_adjustment, safe_float(options['wl_max'])))
+                        water_adjustment = safe_float(options['wl_max'])
+                      
                     #Do not run if the current temperature is below the cutoff temperature and the option is enabled
                     if (safe_float(today['temp_c']) <= safe_float(options['temp_cutoff'])) and options["temp_cutoff_enable"] == "on":
                         water_adjustment = 0
@@ -191,6 +204,7 @@ def options_data():
         'temp_cutoff_enable': 'off',
         'temp_cutoff': 4,
         'wl_min': 0,
+        'wl_min_floor': "on",
         'wl_max': 200,
         'days_history': 3,
         'days_forecast': 3,
@@ -339,7 +353,9 @@ def today_info(obj, options):
             'rain_mm': safe_float(precipd),
             'wind_ms': safe_float(data['wind']['speed']),
             'humidity': safe_float(data['main']['humidity']),
-            'pressure': safe_float(data['main']['pressure'])
+            'pressure': safe_float(data['main']['pressure']),
+            'lat': safe_float(data['main']['lat']),
+            'lon': safe_float(data['main']['lon'])
         }
     except ValueError as excp:
         obj.add_status("An error occurred parsing data: %s" % excp)
